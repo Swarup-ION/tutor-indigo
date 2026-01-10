@@ -170,13 +170,13 @@
                 padding: 6px;
                 height: 38px;
                 border-radius: 6px;
-                background: $primary;
+                background: #0073D0;
                 font-family: $font-family-title;
                 @include media-breakpoint-up(sm) {
                     min-width: 100px;
                 }
                 &:hover {
-                    background: $primary;
+                    background: #0073D0;
                     opacity: .8;
                 }
             }
