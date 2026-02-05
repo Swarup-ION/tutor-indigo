@@ -3,6 +3,39 @@
 let themeCookie = 'indigo-toggle-dark';
 let themeCookieExpiry = 90; // days
 
+(function() {
+    const themeCookie = 'indigo-toggle-dark';
+    const darkClass = 'indigo-dark-theme';
+    const domain = '.learning-hub.iongroup.com';
+
+    // 1. Helper to get cookie value by name
+    const getCookie = (name) => {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;
+    };
+
+    // 2. Read existing theme
+    const currentTheme = getCookie(themeCookie);
+
+    // 3. Logic: If it's 'dark' OR if there is NO cookie yet (default to dark)
+    if (currentTheme === 'dark' || !currentTheme) {
+        document.body.classList.add(darkClass);
+        document.documentElement.classList.add(darkClass);
+
+        // If no cookie existed, set it to 'dark' so other pages stay in sync
+        if (!currentTheme) {
+            const expiry = new Date();
+            expiry.setFullYear(expiry.getFullYear() + 1);
+            document.cookie = `${themeCookie}=dark; expires=${expiry.toUTCString()}; path=/; domain=${domain}; SameSite=Lax; Secure`;
+        }
+    } else {
+        document.body.classList.remove(darkClass);
+        document.documentElement.classList.remove(darkClass);
+    };
+})();
+
 const AddDarkTheme = () => {
   const cookies = new Cookies();
   const isThemeToggleEnabled = getConfig().INDIGO_ENABLE_DARK_TOGGLE;
