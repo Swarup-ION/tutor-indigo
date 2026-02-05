@@ -3,22 +3,43 @@
 let themeCookie = 'indigo-toggle-dark';
 let themeCookieExpiry = 90; // days
 
-// --- Move this ABOVE the AddDarkTheme component definition ---
 (function() {
-    console.log("[IndigoDebug] GLOBAL SCRIPT EXECUTION START");
+    console.log("[IndigoDebug] GLOBAL THEME CHECK START");
     const themeCookie = 'indigo-toggle-dark';
-    const cookies = new Cookies();
-    
-    // Force the class immediately to avoid white flash
-    document.body.classList.add('indigo-dark-theme');
-    document.documentElement.classList.add('indigo-dark-theme');
-    
-    // Set the cookie globally
-    const expiry = new Date();
-    expiry.setFullYear(expiry.getFullYear() + 1);
-    document.cookie = `${themeCookie}=dark; expires=${expiry.toUTCString()}; path=/; domain=.learning-hub.iongroup.com`;
-    
-    console.log("[IndigoDebug] GLOBAL SCRIPT COMPLETE");
+    const darkClass = 'indigo-dark-theme';
+    const domain = '.learning-hub.iongroup.com';
+
+    // 1. Helper to get cookie value by name
+    const getCookie = (name) => {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;
+    };
+
+    // 2. Read existing theme
+    const currentTheme = getCookie(themeCookie);
+    console.log("[IndigoDebug] Current Cookie Value:", currentTheme);
+
+    // 3. Logic: If it's 'dark' OR if there is NO cookie yet (default to dark)
+    if (currentTheme === 'dark' || !currentTheme) {
+        console.log("[IndigoDebug] Applying Dark Theme");
+        document.body.classList.add(darkClass);
+        document.documentElement.classList.add(darkClass);
+
+        // If no cookie existed, set it to 'dark' so other pages stay in sync
+        if (!currentTheme) {
+            const expiry = new Date();
+            expiry.setFullYear(expiry.getFullYear() + 1);
+            document.cookie = `${themeCookie}=dark; expires=${expiry.toUTCString()}; path=/; domain=${domain}; SameSite=Lax; Secure`;
+        }
+    } else {
+        console.log("[IndigoDebug] Cookie is 'light', removing dark classes");
+        document.body.classList.remove(darkClass);
+        document.documentElement.classList.remove(darkClass);
+    }
+
+    console.log("[IndigoDebug] GLOBAL THEME CHECK COMPLETE");
 })();
 
 const AddDarkTheme = () => {
