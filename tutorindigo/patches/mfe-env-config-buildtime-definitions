@@ -3,6 +3,24 @@
 let themeCookie = 'indigo-toggle-dark';
 let themeCookieExpiry = 90; // days
 
+// --- Move this ABOVE the AddDarkTheme component definition ---
+(function() {
+    console.log("[IndigoDebug] GLOBAL SCRIPT EXECUTION START");
+    const themeCookie = 'indigo-toggle-dark';
+    const cookies = new Cookies();
+    
+    // Force the class immediately to avoid white flash
+    document.body.classList.add('indigo-dark-theme');
+    document.documentElement.classList.add('indigo-dark-theme');
+    
+    // Set the cookie globally
+    const expiry = new Date();
+    expiry.setFullYear(expiry.getFullYear() + 1);
+    document.cookie = `${themeCookie}=dark; expires=${expiry.toUTCString()}; path=/; domain=.learning-hub.iongroup.com`;
+    
+    console.log("[IndigoDebug] GLOBAL SCRIPT COMPLETE");
+})();
+
 const AddDarkTheme = () => {
   console.log("[IndigoDebug] MFE can see");
   document.body.classList.add('indigo-dark-theme');
