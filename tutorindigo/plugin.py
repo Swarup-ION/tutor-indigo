@@ -195,6 +195,14 @@ for mfe in indigo_styled_mfes:
             "footer_slot",
            """
         {
+          op: PLUGIN_OPERATIONS.Insert,
+          widget: {
+            id: 'indigo_dark_theme_force',
+            type: DIRECT_PLUGIN,
+            render: AddDarkTheme,
+          }
+        },
+        {
           op: PLUGIN_OPERATIONS.Hide,
           widgetId: 'default_contents',
         }"""
