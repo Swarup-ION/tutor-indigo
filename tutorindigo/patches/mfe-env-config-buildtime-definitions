@@ -38,29 +38,44 @@ const AddDarkTheme = () => {
   };
 
   useEffect(() => {
-    const theme = cookies.get(themeCookie);
-
-    // - When page loads, Footer loads before MFE content. Since there is no iframe on page,
-    // it does not append any class. MutationObserver observes changes in DOM and hence appends dark
-    // attributes when iframe is added. After 15 sec, this observer is destroyed to conserve resources. 
-    // - It has been added outside dark-theme condition so that it can be removed on Component Unmount.
-    // - Observer can be passed to `addDarkThemeToIframes` function and disconnected after observing Iframe.
-    // This approach has a limitation: the observer first detects the iframe and then detects the docSrc. 
-    // We need to wait for docSrc to fully load before appending the style tag.
-    const observer = new MutationObserver(() => {
-      addDarkThemeToIframes();
-    });
-
-    if (isThemeToggleEnabled && theme === 'dark') {
-      document.body.classList.add('indigo-dark-theme');
+      // 1. Log the initial state for debugging
+      const currentTheme = cookies.get(themeCookie);
+      const toggleConfig = getConfig().INDIGO_ENABLE_DARK_TOGGLE;
       
-      observer.observe(document.body, { childList: true, subtree: true });
-      setTimeout(() => observer?.disconnect(), 15000); // clear after 15 sec to avoid resource usage
+      console.log("[IndigoDebug] MFE Load Detected");
+      console.log("[IndigoDebug] Cookie value:", currentTheme);
+      console.log("[IndigoDebug] Toggle Enabled in Config:", toggleConfig);
 
-      cookies.set(themeCookie, theme, getCookieOptions());      //  on page load, update expiry
-    }
+      const observer = new MutationObserver(() => {
+          addDarkThemeToIframes();
+      });
 
-    return () => observer?.disconnect();
+      // 2. MODIFIED CONDITION:
+      // We enter if the cookie is 'dark' OR if there is NO cookie (first run default)
+      if (currentTheme === 'dark' || !currentTheme) {
+          console.log("[IndigoDebug] Condition met! Applying Dark Theme...");
+          
+          document.body.classList.add('indigo-dark-theme');
+          
+          observer.observe(document.body, { childList: true, subtree: true });
+          
+          // Ensure the cookie is set to 'dark' for future refreshes
+          const options = getCookieOptions();
+          console.log("[IndigoDebug] Setting cookie with options:", options);
+          cookies.set(themeCookie, 'dark', options);
+
+          setTimeout(() => {
+              console.log("[IndigoDebug] Disconnecting MutationObserver (15s timeout)");
+              observer?.disconnect();
+          }, 15000);
+      } else {
+          console.log("[IndigoDebug] Condition NOT met. Dark mode skipped.");
+      }
+
+      return () => {
+          console.log("[IndigoDebug] Component Unmounting - cleaning up observer");
+          observer?.disconnect();
+      };
   }, []);
 
   return (<div />);
